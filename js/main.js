@@ -36,8 +36,28 @@ window.addEventListener('load', () => {
   Game.canvas.addEventListener('pointerup', e => call('onPointerUp', e));
   Game.canvas.addEventListener('pointercancel', e => call('onPointerUp', e));
 
+  setupMobile();
+
   State.load();
   Game.go(State.data.character ? 'town' : 'select');
   Game.last = performance.now();
   requestAnimationFrame(t => Game.loop(t));
 });
+
+// 핸드폰: 전체 화면 버튼(주소 표시줄 숨기기 + 가로 고정), 홈 화면 앱 설치 준비
+function setupMobile() {
+  const btn = document.getElementById('fullscreen-btn');
+  const installed = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+  const refresh = () => { btn.hidden = installed || !document.fullscreenEnabled || !!document.fullscreenElement; };
+  btn.addEventListener('click', () => {
+    document.documentElement.requestFullscreen({ navigationUI: 'hide' })
+      .then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'))
+      .catch(() => { /* 가로 고정이 안 되는 기기도 있어요 */ });
+  });
+  document.addEventListener('fullscreenchange', () => { refresh(); Game.fit(); });
+  refresh();
+
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* 없어도 게임은 돼요 */ });
+  }
+}
