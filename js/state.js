@@ -16,7 +16,7 @@ const TIME = {
 };
 
 const TAXI_FEE = 10;
-const ACCIDENT_CHANCE = 0.15;
+const ACCIDENT_CHANCE = 0.25; // 택시 사고 확률 (4번 중 1번쯤)
 
 // 달력에 적을 수 있는 할 일
 const TASKS = {
