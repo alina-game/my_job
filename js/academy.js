@@ -17,8 +17,8 @@ const NOTE_FREQ = [261.63, 293.66, 329.63, 349.23, 392.0, 440.0, 493.88, 523.25]
 const NOTE_KEYS = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k'];
 const SONGS = [
   { name: '나비야', notes: [4, 2, 2, 3, 1, 1, 0, 1, 2, 3, 4, 4, 4] },
-  { name: '학교종', notes: [4, 4, 5, 5, 4, 4, 2, 4, 4, 2, 2, 1] },
-  { name: '산토끼', notes: [4, 2, 2, 4, 2, 0, 1, 2, 1, 0, 2, 4] },
+  { name: '작은 별', notes: [0, 0, 4, 4, 5, 5, 4, 3, 3, 2, 2, 1, 1, 0] },
+  { name: '비행기', notes: [2, 1, 0, 1, 2, 2, 2, 1, 1, 1, 2, 4, 4] },
 ];
 const BALLET_POSES = [
   { key: 'ArrowLeft', arrow: '←', name: '플리에' },
@@ -220,11 +220,13 @@ Game.scenes.academy = {
       class: 'opt', style: 'width:170px;height:90px;font-size:28px', onclick: e => {
         if (o === q.ans) {
           opts.style.pointerEvents = 'none';
+          Sound.play('good', 0.8);
           fb.textContent = '⭐ 정답!';
           this.addScore();
           setTimeout(() => this.quiz(), 600);
         } else {
           e.currentTarget.classList.remove('shake'); void e.currentTarget.offsetWidth; e.currentTarget.classList.add('shake');
+          Sound.play('wrong', 0.6);
           fb.textContent = '다시 생각해 봐요 🤔';
         }
       },

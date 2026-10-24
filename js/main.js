@@ -37,6 +37,7 @@ window.addEventListener('load', () => {
   Game.canvas.addEventListener('pointercancel', e => call('onPointerUp', e));
 
   setupMobile();
+  Sound.init();
 
   State.load();
   Game.go(State.data.character ? 'town' : 'select');

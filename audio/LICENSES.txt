@@ -1,0 +1,58 @@
+나의 직업 — 소리 파일 출처
+================================
+
+이 폴더의 모든 소리는 CC0 (Creative Commons Zero, 퍼블릭 도메인) 파일만 사용했습니다.
+CC0는 출처 표시 없이 누구나 자유롭게 쓸 수 있지만, 기록을 위해 출처를 적어 둡니다.
+게임에 넣을 때 모노 OGG로 변환(용량 줄이기)했고, rain.ogg는 45초만 잘라 썼습니다.
+라이선스 확인일: 2026-10-25 (각 페이지 / 묶음 안의 License.txt, INFO.txt에서 확인)
+
+
+배경음악 (audio/bgm)
+--------------------
+select.ogg    "Stage Select"       Juhani Junkala (subspaceaudio)  https://opengameart.org/content/4-chiptunes-adventure
+tv.ogg        "Stage 1"            Juhani Junkala (subspaceaudio)  https://opengameart.org/content/4-chiptunes-adventure
+school.ogg    "Grasslands"         Juhani Junkala (subspaceaudio)  https://opengameart.org/content/jrpg-pack-1-exploration
+lost.ogg      "Sneaking Around"    Juhani Junkala (subspaceaudio)  https://opengameart.org/content/jrpg-pack-1-exploration
+drive.ogg     "Tropical Island"    Juhani Junkala (subspaceaudio)  https://opengameart.org/content/jrpg-pack-1-exploration
+art.ogg       "Prairie Nights"     Juhani Junkala (subspaceaudio)  https://opengameart.org/content/jrpg-pack-1-exploration
+town.ogg      "Town Theme RPG"     cynicmusic                      https://opengameart.org/content/town-theme-rpg
+night.ogg     "Snowfall (Looped)"  kistol                          https://opengameart.org/content/snowfall
+home.ogg      "Chill lofi inspired" omfgdude                       https://opengameart.org/content/chill-lofi-inspired
+shop.ogg      "Bossa Nova"         joth                            https://opengameart.org/content/bossa-nova
+hospital.ogg  "Next to You"        joth                            https://opengameart.org/content/next-to-you
+outdoor.ogg   "The Field Of Dreams" pauliuw                        https://opengameart.org/content/the-field-of-dreams
+rain.ogg      "rain and thunders"  kindland                        https://opengameart.org/content/rain-and-thunders
+
+
+효과음 (audio/sfx)
+------------------
+Kenney (www.kenney.nl) — CC0
+  Interface Sounds  https://kenney.nl/assets/interface-sounds
+    click, good, wrong, ding, drop, camera
+  RPG Audio         https://kenney.nl/assets/rpg-audio
+    coin, door_open, door_close, cut, chop, cloth, page
+  Casino Audio      https://kenney.nl/assets/casino-audio
+    pay
+  Impact Sounds     https://kenney.nl/assets/impact-sounds
+    step1, step2, step_snow, step_wood, smash, crash, glass, kick
+  Music Jingles     https://kenney.nl/assets/music-jingles
+    done, unlock, morning, fail
+  Digital Audio     https://kenney.nl/assets/digital-audio
+    alert
+
+OpenGameArt — CC0
+  meow.ogg                 "Meow"                ignasd       https://opengameart.org/content/meow
+  meow_food.ogg, purr.ogg  "Cat Purr & Meow"     kerzoven     https://opengameart.org/content/cat-purr-meow
+  siren.ogg (앞 4.5초)      "Sirens and Alarm Noise" aquinn    https://opengameart.org/content/sirens-and-alarm-noise
+  eat1.ogg, eat2.ogg       "7 Eating Crunches"   starninjas   https://opengameart.org/content/7-eating-crunches
+  bubble.ogg, splash.ogg, pour.ogg
+                           "40 CC0 water / splash / slime SFX"  rubberduck
+                                                              https://opengameart.org/content/40-cc0-water-splash-slime-sfx
+
+
+피아노 노래 (학원)
+------------------
+게임 속 피아노 멜로디는 저작권 보호 기간이 끝난 옛 민요만 씁니다 (가사는 넣지 않음).
+  나비야   — 독일 민요 "Hänschen klein"
+  작은 별  — 프랑스 민요 "Ah! vous dirai-je, maman"
+  비행기   — 19세기 미국 노래 "Mary Had a Little Lamb"

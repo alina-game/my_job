@@ -44,6 +44,7 @@ Game.scenes.eat = {
         const now = performance.now();
         if (now - this.lastTap < 450) {
           this.unwrapped = true;
+          Sound.play('cloth', 0.8);
           this.tear = 0.6;
           this.msg = HINT[this.cat];
         } else {
@@ -86,6 +87,7 @@ Game.scenes.eat = {
   },
 
   bite() {
+    Sound.play(this.cat === 'drink' ? 'bubble' : pick(['eat1', 'eat2']), 0.8);
     this.bites++;
     this.yum = 0.7;
     this.drag = null;

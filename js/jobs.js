@@ -102,11 +102,15 @@ Game.scenes.job = {
   },
 
   complete(msg) {
+    const STEP_SFX = { pour: 'pour', add: 'drop', crack: 'chop', cut: 'cut', shape: 'drop', oven: 'ding', decorate: 'drop', wrap: 'cloth' };
+    const cur = this.step();
+    Sound.play((cur && STEP_SFX[cur.type]) || 'good', 0.7);
     for (let k = 0; k < 8; k++) this.sparks.push({ x: WORK.x + (Math.random() - 0.5) * 160, y: WORK.y + (Math.random() - 0.5) * 90, life: 0.7 });
     this.si++;
     if (this.si >= this.order.recipe.length) {
       this.made++;
       this.finishing = { t: 0 };
+      Sound.play('done', 0.8);
       this.st = { drag: null };
       this.fb.textContent = `✨ ${this.order.name} 완성! 손님에게 드려요 😊`;
       this.renderRecipe();
@@ -117,6 +121,7 @@ Game.scenes.job = {
   },
 
   oops(msg) {
+    Sound.play('wrong', 0.6);
     this.fb.textContent = msg;
     this.shakeT = 0.4;
   },

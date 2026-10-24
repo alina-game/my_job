@@ -46,6 +46,7 @@ Game.scenes.outdoor = {
   },
 
   startLost() {
+    Sound.play('alert', 0.9);
     this.phase = 'lost';
     this.t = 0;
     Game.ui.innerHTML = '';
@@ -137,7 +138,7 @@ Game.scenes.outdoor = {
       case '물': return fixNeed('thirst');
       case '비상식량': return fixNeed('hunger');
       case '손전등': this.light = !this.light; return this.talk(this.light ? '밝아졌어요! 🔦' : '손전등을 껐어요');
-      case '카메라': this.flash = 1; return this.talk('찰칵! 사진을 찍었어요 📷');
+      case '카메라': Sound.play('camera', 0.9); this.flash = 1; return this.talk('찰칵! 사진을 찍었어요 📷');
       case '핸드폰': return this.callMom(has('충전기'));
       case '충전기': return this.talk(has('핸드폰') ? '핸드폰을 충전했어요 🔌' : '충전할 게 없어요...');
       case '이불': this.blanket = !this.blanket; return this.talk(this.blanket ? '포근하고 따뜻해요 🛏️' : '이불을 개었어요');

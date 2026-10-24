@@ -58,8 +58,10 @@ Game.scenes.school = {
           this.got++;
           State.data.stickers++;
           State.save();
+          Sound.play('good', 0.8);
           fb.textContent = '⭐ 정답! 칭찬 스티커를 받았어요!';
         } else {
+          Sound.play('wrong', 0.6);
           e.currentTarget.classList.add('shake');
           fb.textContent = `아쉬워요! 정답은 "${q.ans}" 예요`;
         }

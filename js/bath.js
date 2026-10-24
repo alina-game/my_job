@@ -46,6 +46,7 @@ Game.scenes.bath = {
   useToilet() {
     if (this.flush > 0) return;
     this.flush = 2;
+    Sound.play('pour', 0.9);
     toast('🚽 볼일 끝! 물을 내려요… 쏴아아~ 🌀');
     setTimeout(() => toast('🧼 손도 꼭 씻어요!'), 2100);
   },
@@ -59,6 +60,7 @@ Game.scenes.bath = {
     const a = BATH_ACTS[this.act].area;
     if (Math.hypot(x - a.x, y - a.y) < a.r) {
       this.prog += Math.hypot(x - r.x, y - r.y) / RUB_NEED;
+      if (Math.random() < 0.08) Sound.play('bubble', 0.4);
       if (Math.random() < 0.5) this.bubbles.push({ x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 30, r: 6 + Math.random() * 14, life: 2.5 });
       this.progEl.firstChild.style.width = Math.min(100, this.prog * 100) + '%';
       if (this.prog >= 1) {

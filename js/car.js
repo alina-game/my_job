@@ -122,12 +122,13 @@ Game.scenes.taxi = {
       if (this.crashAt != null && this.t >= this.crashAt) {
         this.phase = 'crash';
         this.t = 0;
+        setTimeout(() => { Sound.play('crash', 1); Sound.play('glass', 0.8); }, 500);
         Game.ui.innerHTML = '';
       } else if (this.t >= TIME.drive) this.arrive();
     } else if (this.phase === 'crash') {
       this.speed = Math.max(0, this.speed - dt * 900);
       this.scroll += this.speed * dt;
-      if (this.t >= 2.2) { this.phase = 'ambulance'; this.t = 0; }
+      if (this.t >= 2.2) { this.phase = 'ambulance'; this.t = 0; Sound.play('siren', 0.8); }
     } else if (this.phase === 'ambulance') {
       if (this.t >= 3.5) { this.phase = 'done'; Game.go('ward'); }
     }

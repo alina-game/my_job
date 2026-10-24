@@ -39,6 +39,7 @@ const Game = {
     const sc = this.scene;
     if (sc) {
       if (sc.update) sc.update(dt);
+      if (typeof Sound !== 'undefined') Sound.tick(dt);
       this.ctx.clearRect(0, 0, W, H);
       if (sc.draw) sc.draw(this.ctx);
     }

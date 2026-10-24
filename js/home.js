@@ -113,6 +113,7 @@ Game.scenes.home = {
     if (p.moved > 25 && this.catAt(x, y) === p.i) {
       const c = State.data.cats[p.i];
       c.happy = Math.min(100, c.happy + dd / 40);
+      if (this.catPos[p.i].petT <= 0) Sound.play('purr', 0.6);
       this.catPos[p.i].petT = 0.6;
       if (Math.random() < 0.2) this.hearts.push({ x, y: y - 20, life: 1 });
     }
@@ -159,6 +160,7 @@ Game.scenes.home = {
             if (c.sick) return toast(`🤒 ${josa(c.name, '이', '가')} 기운이 없어서 못 놀아요…`);
             o.remove();
             this.play = { i, t: FAST ? 4 : 8, x: 480, y: 450 };
+            Sound.play('meow', 0.9);
             toast('🧶 마우스를 움직여서 털실로 놀아줘요!');
           },
         }, '🧶 놀아주기'),
@@ -230,6 +232,7 @@ Game.scenes.home = {
 
   // ---------- 엄마 등짝 스매싱 ----------
   startMom(thenSleep) {
+    Sound.play('door_open', 1);
     const door = ROOMS[this.room].spots[ROOMS[this.room].momDoor];
     const fromX = door.x + door.w / 2;
     const missed = State.unfinishedToday().map(t => TASKS[t].replace(/^\S+\s/, ''));
@@ -253,7 +256,7 @@ Game.scenes.home = {
       case 'talk': if (m.t > 2.2) next('smash'); break;
       case 'smash':
         m.armUp = m.t < 0.35 ? m.t / 0.35 : Math.max(0, 1 - (m.t - 0.35) / 0.12);
-        if (m.t >= 0.4 && !this.handprint) { this.handprint = true; this.shake = 0.5; this.smashT = 0.9; }
+        if (m.t >= 0.4 && !this.handprint) { Sound.play('smash', 1); this.handprint = true; this.shake = 0.5; this.smashT = 0.9; }
         if (m.t > 0.7) next('ouch');
         break;
       case 'ouch': if (m.t > 1.8) next('leave'); break;
