@@ -155,7 +155,7 @@ Game.scenes.ward = {
 
   discharge() {
     this.out = true;
-    State.data.sick = false;
+    Illness.cure();
     State.save();
     Game.ui.innerHTML = '';
     const friends = WARD_PATIENTS.filter(p => (State.data.friends[p.name] || 0) >= 100).map(p => p.name);

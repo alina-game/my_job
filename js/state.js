@@ -71,7 +71,6 @@ const State = {
       bag: [],          // 가방 속 물건
       x: 60,            // 동네에서 캐릭터 위치
       sick: false,      // 캐릭터가 아픈지
-      tookMedicine: false, // 오늘 약을 먹었는지 (자고 나면 나음)
       washed: false,    // 오늘 씻었는지 (병에 덜 걸림)
       stickers: 0,      // 학교 칭찬 스티커
       schoolDay: 0,     // 마지막으로 학교 간 날
@@ -84,6 +83,10 @@ const State = {
       momDay: 0,        // 엄마가 마지막으로 확인한 날
       homework: [],     // 받은 숙제 (학원 과목)
       friends: {},      // 병원에서 만난 환자들 친한 마음 { 이름: 0~100 }
+      illness: null,    // 지금 걸린 병 { type, day, medDays, medToday }
+      cast: null,       // 깁스 { limb: 'arm'|'leg', until: 풀 수 있는 날 }
+      wet: 0,           // 비 맞은 정도 (100 감기, 200 독감)
+      dirtyHands: false, // 화장실 다녀와서 손 안 씻음
     };
   },
 

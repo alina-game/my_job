@@ -8,9 +8,9 @@ const SFX_NAMES = ['click', 'good', 'wrong', 'ding', 'drop', 'camera', 'coin', '
 // 화면마다 나오는 배경음악
 const SCENE_BGM = {
   select: 'select', shop: 'shop', job: 'shop', store: 'shop', home: 'home', bath: 'home', eat: 'home',
-  tv: 'tv', school: 'school', academy: 'school', ward: 'hospital', taxi: 'drive', art: 'art', outdoor: 'outdoor',
+  tv: 'tv', school: 'school', academy: 'school', ward: 'hospital', clinic: 'hospital', taxi: 'drive', art: 'art', outdoor: 'outdoor',
 };
-const INDOOR = ['shop', 'job', 'store', 'home', 'school', 'academy', 'art'];
+const INDOOR = ['shop', 'job', 'store', 'home', 'school', 'academy', 'art', 'clinic'];
 const SOUND_KEY = 'myjob_sound';
 
 const Sound = {

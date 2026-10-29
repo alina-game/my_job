@@ -34,6 +34,12 @@ Game.scenes.eat = {
     Game.ui.append(h('div', { class: 'topbar' },
       h('button', { class: 'btn small gray', onclick: () => Game.go('home') }, '⬅ 그만 먹기'),
       h('span', {}, `🍽️ ${this.item.icon} ${this.item.name}`)));
+    const block = Illness.canEat(this.item);
+    if (block) {
+      this.finished = true;
+      setTimeout(() => modal(h('h2', {}, '🙅 지금은 못 먹어요'), h('p', {}, block),
+        h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => Game.go('home') }, '확인'))), 50);
+    }
   },
 
   onPointerDown(x, y) {
@@ -102,7 +108,9 @@ Game.scenes.eat = {
       setTimeout(() => modal(
         h('h2', {}, '😋 다 먹었어요!'),
         h('p', {}, `${josa(this.item.name, '을', '를')} 맛있게 먹었어요. 배불러요!`),
-        h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => Game.go('home') }, '확인'))), 700);
+        h('div', { class: 'row' }, h('button', {
+          class: 'btn', onclick: e => { e.currentTarget.closest('.overlay').remove(); Illness.afterEating(this.item, () => Game.go('home')); },
+        }, '확인'))), 700);
     } else {
       this.msg = this.cat === 'ramen' ? '젓가락으로 또 집어요!' : HINT[this.cat];
     }

@@ -83,13 +83,28 @@ Game.scenes.school = {
       h('p', {}, `${CLASS_QUESTIONS}문제 중에 ${this.got}개 맞혀서 ⭐ 칭찬 스티커 ${this.got}개를 받았어요!`),
       h('p', {}, '쉬는 시간이에요. 친구들이랑 뭐 하고 놀까요?'),
       h('div', { class: 'row' },
-        h('button', { class: 'btn green', onclick: () => this.startBall() }, '⚽ 공 튀기기'),
-        h('button', { class: 'btn pink', onclick: () => this.startTag() }, '🏃 술래잡기'),
+        h('button', { class: 'btn green', onclick: () => this.tryPlay(() => this.startBall()) }, '⚽ 공 튀기기'),
+        h('button', { class: 'btn pink', onclick: () => this.tryPlay(() => this.startTag()) }, '🏃 술래잡기'),
         h('button', { class: 'btn gray', onclick: () => Game.go('town') }, '🎒 집에 가기')));
   },
 
   // ---------- 쉬는 시간 ----------
+  tryPlay(start) {
+    const no = Illness.canExercise();
+    if (no) return toast(no, 3000);
+    start();
+    this.dur = this.left;
+    this.injureAt = Illness.rollInjury(this.dur);
+  },
+
+  hurt() {
+    this.phase = 'done';
+    this.injured = true;
+    Illness.injure(this.ball && this.friends == null ? '공 튀기기' : '술래잡기', () => Game.go('town'));
+  },
+
   startBall() {
+    this.friends = null;
     this.phase = 'ball';
     this.left = FAST ? 10 : 30;
     this.score = 0;
@@ -141,6 +156,7 @@ Game.scenes.school = {
     this.t += dt;
     if (this.phase !== 'ball' && this.phase !== 'tag') return;
     this.left -= dt;
+    if (this.injureAt != null && this.dur - this.left >= this.injureAt) return this.hurt();
     this.scoreEl.textContent = `⏰ ${fmt(this.left)} · ${this.phase === 'ball' ? '튀긴 횟수' : '잡은 친구'} ${this.score}`;
     if (this.phase === 'ball') {
       const b = this.ball;

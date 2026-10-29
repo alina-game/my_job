@@ -40,6 +40,7 @@ window.addEventListener('load', () => {
   Sound.init();
 
   State.load();
+  Illness.migrate();
   Game.go(State.data.character ? 'town' : 'select');
   Game.last = performance.now();
   requestAnimationFrame(t => Game.loop(t));

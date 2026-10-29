@@ -21,7 +21,7 @@ Game.scenes.bath = {
     Game.ui.innerHTML = '';
     this.progEl = h('div', { class: 'progress', style: 'width:300px;margin:0' }, h('div', { style: 'width:0%' }));
     Game.ui.append(h('div', { class: 'topbar' },
-      h('button', { class: 'btn small gray', onclick: () => this.act ? (this.act = null, this.render()) : Game.go('home') }, this.act ? '⬅ 그만하기' : '🚪 나가기'),
+      h('button', { class: 'btn small gray', onclick: () => this.act ? (this.act = null, this.render()) : this.leave() }, this.act ? '⬅ 그만하기' : '🚪 나가기'),
       h('span', {}, this.act ? BATH_ACTS[this.act].label : '🚽 화장실'),
       h('div', { class: 'spacer' }),
       this.act ? this.progEl : (State.data.washed ? h('div', { class: 'pill' }, '✨ 오늘 씻었어요') : null)));
@@ -43,9 +43,16 @@ Game.scenes.bath = {
     this.render();
   },
 
+  leave() {
+    if (State.data.dirtyHands) toast('🖐️ 앗! 손을 안 씻었어요. 이대로 먹으면 배가 아플 수 있어요', 3500);
+    Game.go('home');
+  },
+
   useToilet() {
     if (this.flush > 0) return;
     this.flush = 2;
+    State.data.dirtyHands = true;
+    State.save();
     Sound.play('pour', 0.9);
     toast('🚽 볼일 끝! 물을 내려요… 쏴아아~ 🌀');
     setTimeout(() => toast('🧼 손도 꼭 씻어요!'), 2100);
@@ -66,6 +73,7 @@ Game.scenes.bath = {
       if (this.prog >= 1) {
         this.doneT = 1.5;
         State.data.washed = true;
+        if (this.act === 'hands' || this.act === 'bath') State.data.dirtyHands = false;
         State.markDone('wash');
         toast(BATH_ACTS[this.act].done, 2500);
       }
@@ -119,7 +127,7 @@ Game.scenes.bath = {
     text(ctx, '욕조', 775, 460, 18, '#37474f');
 
     if (!this.act) {
-      drawCharacter(ctx, currentLook(), 330, 520, 1.2, { sick: State.data.sick });
+      drawCharacter(ctx, currentLook(), 330, 520, 1.2, Illness.look());
       return;
     }
 

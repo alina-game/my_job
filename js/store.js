@@ -10,11 +10,11 @@ const CORNERS = [
   { name: '과자 코너', items: [['🍪', '초코쿠키', 'snack', '🍪'], ['🥨', '프레첼', 'snack', '🥨'], ['🍬', '사탕', 'snack', '🍬']] },
   { name: '아이스크림 코너', items: [['🍦', '바닐라콘', 'grab'], ['🍨', '딸기 아이스크림', 'grab'], ['🍧', '빙수바', 'grab']] },
   { name: '음료수 코너', items: [['🧃', '사과주스', 'drink'], ['🧃', '오렌지주스', 'drink'], ['🥛', '바나나우유', 'drink']] },
-  { name: '약 코너', items: [['💊', '감기약', 'medicine'], ['🌡️', '해열제', 'medicine']] },
+  { name: '약 코너', items: [['💊', '감기약', 'medicine'], ['🌡️', '해열제', 'medicine'], ['💊', '소화제', 'medicine'], ['💊', '지사제', 'medicine']] },
   { name: '반려동물 코너', items: [['🐟', '고양이 사료', 'catfood'], ['🥫', '고양이 캔', 'catfood'], ['💊', '고양이 약', 'catmed']] },
   { name: '물 코너', items: [['💧', '생수', 'drink'], ['💧', '큰 생수', 'drink']] },
 ];
-const NOT_FOOD = { medicine: '집 식탁에서 먹으면 자고 나서 나아요', catfood: '집에서 고양이에게 줄 수 있어요', catmed: '아픈 고양이에게 먹여요' };
+const NOT_FOOD = { medicine: '아플 때 병에 맞는 약을 집 식탁에서 먹어요', catfood: '집에서 고양이에게 줄 수 있어요', catmed: '아픈 고양이에게 먹여요' };
 
 Game.scenes.store = {
   enter() {
@@ -49,7 +49,7 @@ Game.scenes.store = {
     const d = State.data;
     if (d.coins < STORE_PRICE) return toast('😢 코인이 부족해요! 아르바이트로 모아 봐요');
     d.coins -= STORE_PRICE;
-    d.bag.push({ kind: NOT_FOOD[cat] ? cat : 'food', icon, name, cat, piece });
+    d.bag.push({ kind: NOT_FOOD[cat] ? cat : 'food', icon, name, cat, piece, boughtDay: d.day });
     State.save();
     toast(`${icon} ${josa(name, '을', '를')} 샀어요! ${NOT_FOOD[cat] || '집 식탁에서 먹어요'}`);
     this.render();

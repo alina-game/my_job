@@ -55,7 +55,7 @@ Game.scenes.home = {
         h('button', { class: 'btn small gray', onclick: () => Game.go('town') }, '🚪 밖으로 나가기'),
         h('span', {}, `🏠 우리 집 · ${ROOMS[this.room].name}`),
         h('div', { class: 'spacer' }),
-        d.sick ? h('div', { class: 'pill', style: 'background:#ffd6d6' }, '🤒 아파요') : null,
+        healthPill(),
         (d.schedule[d.day] || []).length ? h('div', { class: 'pill', style: unfinished.length ? 'background:#fff3cd' : 'background:#d4f5dc' },
           unfinished.length ? `📅 남은 일정 ${unfinished.length}개` : '📅 오늘 일정 끝!') : null,
         h('div', { class: 'pill' }, `${night ? '🌙 밤' : '☀️ 낮'} · ${d.day}일째`),
@@ -193,15 +193,8 @@ Game.scenes.home = {
       const paid = (d.day - 1) % SALARY_DAYS === 0;
       if (paid) d.coins += SALARY;
 
-      // 캐릭터 병: 약 먹고 자면 나음. 안 씻으면 병에 더 잘 걸림.
-      if (d.sick && d.tookMedicine) { d.sick = false; news.push('💊 약 먹고 푹 잤더니 감기가 다 나았어요!'); }
-      else if (d.sick) news.push('🤒 아직 아파요. 병원에 가거나 감기약을 먹고 자요');
-      else if (Math.random() < (d.washed ? 0.05 : 0.15)) {
-        d.sick = true;
-        news.push('🤒 으슬으슬… 감기에 걸렸어요! 아르바이트와 학교는 쉬어야 해요');
-        news.push('병원에 가거나 편의점 감기약을 먹고 자면 나아요' + (d.washed ? '' : ' (잘 씻으면 병에 덜 걸려요)'));
-      }
-      d.tookMedicine = false;
+      // 병: 낫거나, 그냥 두면 심해지거나, 너무 심하면 구급차 (illness.js)
+      const ambulance = Illness.night(news);
       d.washed = false;
 
       // 고양이: 배고파지고, 가끔 아픔
@@ -223,10 +216,13 @@ Game.scenes.home = {
       Game.go('home', { noMom: true });
       modal(
         h('h2', {}, `☀️ ${d.day}일째 아침이에요!`),
-        h('p', {}, d.sick ? '오늘은 몸이 안 좋아요…' : '푹 잤어요. 오늘도 힘내요!'),
+        h('p', {}, d.illness ? '오늘은 몸이 안 좋아요…' : '푹 잤어요. 오늘도 힘내요!'),
         paid ? h('p', { style: 'color:#b8860b;font-size:26px' }, `💰 월급 ${SALARY}코인을 받았어요!`) : h('p', { style: 'color:#888' }, `월급까지 ${SALARY_DAYS - (d.day - 1) % SALARY_DAYS}일 남았어요`),
         news.map(m => h('p', { style: 'font-size:18px' }, m)),
-        h('div', { class: 'row' }, h('button', { class: 'btn', onclick: e => e.currentTarget.closest('.overlay').remove() }, '좋아요')));
+        h('div', { class: 'row' }, ambulance
+          ? h('button', { class: 'btn red', onclick: () => Game.go('ward') }, '🚑 구급차 타고 병원으로')
+          : h('button', { class: 'btn', onclick: e => e.currentTarget.closest('.overlay').remove() }, '좋아요')));
+      if (ambulance) Sound.play('siren', 0.8);
     }, 1800);
   },
 
@@ -286,20 +282,21 @@ Game.scenes.home = {
       items.length
         ? h('div', { class: 'list' }, items.map(f => h('button', {
           class: 'opt', onclick: () => f.it.kind === 'medicine' ? this.takeMedicine(f.idx, o) : Game.go('eat', { idx: f.idx }),
-        }, h('span', { class: 'ic' }, f.it.icon), f.it.name)))
+        }, h('span', { class: 'ic' }, f.it.icon), f.it.name,
+          Illness.isSpoiled(f.it) ? h('span', { style: 'color:#d32f2f;font-size:13px' }, '⚠️ 3일 지났어요') : null)))
         : h('p', {}, '먹을 음식이 없어요. 편의점에서 사 와요! 🏪'),
       h('div', { class: 'row' }, h('button', { class: 'btn gray', onclick: () => o.remove() }, '닫기')));
   },
 
   takeMedicine(idx, o) {
-    const d = State.data;
-    if (!d.sick) return toast('😊 아프지 않을 때는 약을 안 먹어도 돼요');
-    if (d.tookMedicine) return toast('💊 오늘은 벌써 약을 먹었어요. 푹 자요');
+    const d = State.data, item = d.bag[idx];
+    const problem = Illness.takeMedicine(item);
+    if (problem) return toast(problem, 3000);
     d.bag.splice(idx, 1);
-    d.tookMedicine = true;
     State.save();
     o.remove();
-    toast('💊 약을 먹었어요. 푹 자고 나면 나을 거예요', 3000);
+    const def = Illness.def();
+    toast(`💊 ${josa(item.name, '을', '를')} 먹었어요. 푹 자고 나면 ${def.nights > 1 ? '조금씩' : ''} 나을 거예요`, 3000);
   },
 
   // ---------- 움직임 ----------
@@ -358,7 +355,7 @@ Game.scenes.home = {
     // 캐릭터 + 고양이 + 엄마 (화면 아래쪽에 있는 것을 나중에 그림)
     const m = this.mom;
     const ouch = m && (m.phase === 'ouch' || m.phase === 'leave' || m.phase === 'close');
-    const things = [{ y: 505, draw: () => drawCharacter(ctx, currentLook(), 460, 505, 1.3, { sick: State.data.sick, ouch, handprint: this.handprint, dir: m ? Math.sign(m.x - 460) || 1 : 1 }) }];
+    const things = [{ y: 505, draw: () => drawCharacter(ctx, currentLook(), 460, 505, 1.3, { ...Illness.look(), ouch: ouch || undefined, handprint: this.handprint, dir: m ? Math.sign(m.x - 460) || 1 : 1 }) }];
     State.data.cats.forEach((c, i) => {
       const p = this.catPos[i];
       if (!p) return;

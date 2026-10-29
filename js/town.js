@@ -182,7 +182,7 @@ Game.scenes.town = {
         h('div', { class: 'pill' }, `${night ? '🌙 밤' : '☀️ 낮'} · ${d.day}일째 · ${weatherFor(d.day)[0]} ${weatherFor(d.day)[1]}`),
         h('div', { class: 'pill' }, `💰 ${d.coins}`),
         h('div', { class: 'pill' }, `💼 아르바이트 ${Math.min(d.jobsToday, JOBS_PER_DAY)}/${JOBS_PER_DAY}`),
-        d.sick ? h('div', { class: 'pill', style: 'background:#ffd6d6' }, '🤒 아파요') : null,
+        healthPill(),
         h('button', { class: 'btn small', onclick: openBag }, '🎒 가방'),
         FAST ? h('div', { class: 'pill' }, '⚡ 빠른 모드') : null),
       h('button', { class: 'btn home-btn corner-tr' + (night ? ' blink' : ''), onclick: () => Game.go('home') }, '🏠 집으로'),
@@ -203,7 +203,7 @@ Game.scenes.town = {
   enterBuilding(b) {
     const night = State.isNight();
     if (b.kind === 'store') return Game.go('store');
-    if (b.kind === 'hospital') return openHospital();
+    if (b.kind === 'hospital') return Game.go('clinic');
     if (b.kind === 'taxi') return Game.go('taxi');
     if (b.kind === 'academy') {
       if (night) return toast('🌙 밤에는 학원이 문을 닫아요');
@@ -245,8 +245,18 @@ Game.scenes.town = {
     if (k.ArrowRight) vx += 1;
     if (k.ArrowUp) vy -= 1;
     if (k.ArrowDown) vy += 1;
+    // 아플 때: 가끔 증상 말풍선, "화장실 급해요!"면 잠깐 멈춤
+    this.symT = (this.symT ?? 3) - dt;
+    this.symShow = Math.max(0, (this.symShow || 0) - dt);
+    this.freeze = Math.max(0, (this.freeze || 0) - dt);
+    if (this.symT <= 0) {
+      this.symT = 5 + Math.random() * 4;
+      const line = Illness.symptomLine();
+      if (line) { this.symText = line.text; this.symShow = 2.4; if (line.stop) this.freeze = 1.6; }
+    }
+    if (this.freeze > 0) { vx = 0; vy = 0; }
     if (vx || vy) this.target = null;
-    if (this.target) {
+    if (this.target && !this.freeze) {
       const dx = this.target.tx - this.px;
       if (Math.abs(dx) < 8) {
         const { b, cat } = this.target;
@@ -255,7 +265,7 @@ Game.scenes.town = {
         if (b) return this.enterBuilding(b);
       } else vx = Math.sign(dx);
     }
-    this.px += vx * (State.data.sick ? 160 : 270) * dt;
+    this.px += vx * 270 * Illness.speed() * dt;
     this.py = clamp(this.py + vy * 150 * dt, 455, 515);
     if (vx) this.dir = vx;
     this.walk = (vx || vy) ? this.walk + dt * 12 : 0;
@@ -403,12 +413,31 @@ Game.scenes.town = {
     }
 
     // 캐릭터
-    drawCharacter(ctx, currentLook(), this.px - cam, this.py, 1, { walk: this.walk, dir: this.dir, sick: State.data.sick });
+    drawCharacter(ctx, currentLook(), this.px - cam, this.py, 1, Object.assign({ walk: this.walk, dir: this.dir }, Illness.look()));
+    this.drawHealth(ctx, this.px - cam, this.py);
     this.drawWeather(ctx);
     if (this.nearCat && !Game.hasOverlay()) {
       bubble(ctx, '스페이스바: 길고양이 데려가기 🐱', this.px - cam, this.py - 122, 16);
     } else if (this.near && !Game.hasOverlay()) {
       bubble(ctx, `스페이스바: ${this.near.name} 들어가기`, this.px - cam, this.py - 118, 16);
+    }
+  },
+
+  // 증상 말풍선, 비 맞은 정도
+  drawHealth(ctx, x, y) {
+    const d = State.data;
+    if (this.symShow > 0 && this.symText) bubble(ctx, this.symText, x, y - 150, 16);
+    if (d.wet > 1) {
+      const pct = Math.min(200, Math.round(d.wet));
+      ctx.fillStyle = 'rgba(0,0,0,.45)'; rr(ctx, x - 46, y + 8, 92, 18, 9); ctx.fill();
+      ctx.fillStyle = pct >= 100 ? '#ff7043' : '#4fc3f7';
+      rr(ctx, x - 44, y + 10, 88 * Math.min(1, pct / 200), 14, 7); ctx.fill();
+      text(ctx, `💧 젖음 ${pct}%`, x, y + 17, 11, '#fff');
+      if (pct > 30) for (let k = 0; k < 3; k++) {
+        const t = (this.t * 2 + k / 3) % 1;
+        ctx.fillStyle = 'rgba(120,190,255,.8)';
+        ctx.beginPath(); ctx.arc(x - 14 + k * 14, y - 60 + t * 50, 2.5, 0, 7); ctx.fill();
+      }
     }
   },
 
@@ -702,28 +731,13 @@ Game.scenes.town = {
   },
 };
 
-// 병원: 진료비를 내면 바로 나아요 (밤에도 열려 있어요)
-function openHospital() {
-  const d = State.data;
-  const close = () => o.remove();
-  const o = modal(
-    h('h2', {}, '🏥 병원'),
-    h('div', { style: 'font-size:72px' }, '👩‍⚕️'),
-    d.sick
-      ? [h('p', {}, '어디가 아파서 왔어요? 감기에 걸렸군요!'), h('p', {}, `주사 맞고 약 먹으면 바로 나아요. 진료비 💰 ${DOCTOR_FEE}코인`)]
-      : h('p', {}, '튼튼하네요! 아프면 언제든 오세요 😊'),
-    h('div', { class: 'row' },
-      d.sick ? h('button', {
-        class: 'btn green', onclick: () => {
-          if (d.coins < DOCTOR_FEE) return toast('😢 코인이 부족해요. 편의점에서 감기약을 사서 먹고 자도 나아요');
-          d.coins -= DOCTOR_FEE;
-          d.sick = false;
-          State.save();
-          Game.go('town');
-          toast('💉 주사 맞고 다 나았어요! 이제 아르바이트도 할 수 있어요', 3500);
-        },
-      }, '치료받기') : null,
-      h('button', { class: 'btn gray', onclick: close }, '나가기')));
+// 지금 아픈 병 / 깁스 표시
+function healthPill() {
+  const d = State.data, def = Illness.def();
+  if (def) return h('div', { class: 'pill', style: 'background:#ffd6d6' }, `${def.icon} ${def.name}`);
+  if (d.cast) return h('div', { class: 'pill', style: 'background:#eceff1' }, `🦴 ${d.cast.limb === 'arm' ? '팔' : '다리'} 깁스`);
+  if (d.dirtyHands) return h('div', { class: 'pill', style: 'background:#fff3cd' }, '🖐️ 손 씻어야 해요');
+  return null;
 }
 
 // 동물병원: 아픈 고양이를 치료해요

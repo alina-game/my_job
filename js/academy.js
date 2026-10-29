@@ -111,7 +111,12 @@ Game.scenes.academy = {
 
   // ---------- 수업 공통 ----------
   startClass(key) {
+    if (['soccer', 'basketball', 'ballet'].includes(key)) {
+      const no = Illness.canExercise();
+      if (no) return toast(no, 3000);
+    }
     const c = ACADEMY_CLASSES.find(x => x.key === key);
+    this.injureAt = key === 'soccer' || key === 'basketball' ? Illness.rollInjury(TIME.academy) : null;
     this.cls = c;
     this.phase = 'class';
     this.score = 0;
@@ -177,6 +182,11 @@ Game.scenes.academy = {
     const left = (this.end - performance.now()) / 1000;
     this.timerEl.textContent = `⏰ ${fmt(left)}`;
     if (left <= 0) return this.finishClass();
+    if (this.injureAt != null && TIME.academy - left >= this.injureAt) {
+      this.done = true;
+      this.injureAt = null;
+      return Illness.injure(`${this.cls.name} 수업`, () => Game.go('town'));
+    }
     const u = this['upd_' + this.cls.key];
     if (u) u.call(this, dt);
     for (const f of this.fx) f.life -= dt;
